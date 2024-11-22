@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 #1.Меропприятие
 class Event:
@@ -43,7 +44,22 @@ class Category:
     def __init__(self, name_cat: str, pricemultiplier: float):
         self.cat= name_cat
         self.multiplier = pricemultiplier
-    
-class 
+
+class User:
+    def __init__(self, user_name:str, email:str):
+        self.name = user_name
+        self.mail = email
+
+class Order:
+    def __init__(self, user: 'User', tickets: List['Ticket'] = []):
+        self.User = user
+        self.tickets = tickets
+        self.is_paid = False
+
+    def calculate_total_price(self) -> float:
+        #мб кол-во на коэфцены?
+
+
+
 
 
