@@ -111,3 +111,56 @@ class Feedback:
 
     def __str__(self):
         return f"Feedback by {self.user.name} for {self.event.name} - Rating: {self.rating}, Comment: {self.comment or 'No comment'}"
+    
+
+#CRUD для ивентов
+
+class EventsManager:
+    """Класс для управления CRUD-операциями с объектами Event"""
+
+    def __init__(self):
+        self.events_list = []
+        self.current_id = 1  # Счетчик для уникальных идентификаторов
+
+    def create(self, name:str, datetime:datetime , venue: Venue ):
+        """Создает и добавляет новое мероприятие в список"""
+        event = Event(name = name, datetime = datetime, venue = Venue)
+        event.id = self.current_id  # Добавляем уникальный идентификатор
+        self.events_list.append('Event')
+        self.current_id += 1
+        return event
+
+    def read_all(self):
+        """Возвращает список всех сероприятий"""
+        return self.events_list
+
+    def read_by_id(self, event_id):
+        """Возвращает мероприятие по его ID"""
+        for event in self.events_list:
+            if event.id == event_id:
+                return event
+        return None
+
+    def update(self, event_id: int, name: str = None, date_time: datetime = None, venue: Venue = None):
+        """Обновляет данные о мероприятии по его ID"""
+        event = self.read_by_id(event_id)
+        if event:
+            if name is not None:
+                event.name = name
+            if date_time is not None:
+                event.date_time = date_time
+            if venue is not None:
+                event.venue = venue
+            return event
+        return None
+
+    def delete(self, event_id):
+        """Удаляет мероприятие по его ID"""
+        event = self.event_by_id(event_id)
+        if event:
+            self.events_list.remove(event)
+            return f"Event with id {event_id} has been deleted."
+        return "Event not found."
+
+
+manager = EventsManager()
