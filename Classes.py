@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 import json
+from xml.etree import ElementTree as ET
 
 # 1. Мероприятие
 class Event:
@@ -27,6 +28,13 @@ class Event:
         venue = Venue.from_json(js.get('venue')) if js.get('venue') else None     #ну тут просто функция вызываем
         return Event (name, date_time, venue)
 
+    def to_xml(self) -> ET.Element:
+        event_elem = ET.Element("Event")
+        ET.SubElement(event_elem, "Name").text = self.name
+        ET.SubElement(event_elem, "DateTime").text = self.date_time.isoformat() if self.date_time else None #снова в ISO формат
+        if self.venue:
+            event_elem.append(self.venue.to_xml())
+        return event_elem
     
 
 # 2. Место проведения
@@ -57,6 +65,16 @@ class Venue:
         seats = Seat.from_json_list(js['seats'])
         return Venue(name, place, capacity, seats )
     
+    def to_xml(self) -> ET.Element:
+        venue_elem = ET.Element("Venue")
+        ET.SubElement(venue_elem, "Name").text = self.name
+        ET.SubElement(venue_elem, "Place").text = self.place
+        ET.SubElement(venue_elem, "Capacity").text = str(self.capacity)
+        seats_elem = ET.SubElement(venue_elem, "Seats")     #опять список(ну и зчем делал с ивентом сериализацию :((((((
+        for seat in self.seats:
+            seats_elem.append(seat.to_xml())
+        return venue_elem
+    
 # 3. Место (на мероприятии)
 class Seat:
     def __init__(self, row: int, number: int, is_avaible : bool = True):
@@ -84,6 +102,13 @@ class Seat:
     def from_json_list(json_list):
         #Десериализация списка объектов
         return [Seat.from_json(item) for item in json_list]
+    
+    def to_xml(self) -> ET.Element:
+        seat_elem = ET.Element("Seat")
+        ET.SubElement(seat_elem, "Row").text = str(self.row)
+        ET.SubElement(seat_elem, "Number").text = str(self.number)
+        ET.SubElement(seat_elem, "IsAvailable").text = str(self.is_available)
+        return seat_elem
 
 # 4. Билет
 class Ticket:
