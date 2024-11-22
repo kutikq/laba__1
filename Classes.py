@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+import json
 
 # 1. Мероприятие
 class Event:
@@ -7,6 +8,15 @@ class Event:
         self.name = name
         self.date_time = date_time  # время проведения
         self.venue = venue  # место проведения
+
+    def to_json(self):
+        return {
+            'name': self.name,
+            #для сериализации формата datetime нужна команда self.date_time.isoformat
+            'date_time': self.date_time.isoformat() if self.date_time else None,
+            #т.к. содержит Venue надо и для него написать функцию сериализации
+            'venue': self.venue.to_json() if self.venue else None  # Сериализация venue
+        }     
 
 # 2. Место проведения
 class Venue:
@@ -18,12 +28,27 @@ class Venue:
         self.capacity = capacity  # вместимость
         self.seats: List['Seat'] = []  # список мест
 
+    def to_json(self):
+        return {
+            'name' : self.name,
+            'place' : self.place,            
+            'capacity' :  self.capacity,
+            #аааааа, опять содежит список мест, снова писать def to_json
+            'seats': [seat.to_json() for seat in self.seats]  # Список мест
+        }
 # 3. Место (на мероприятии)
 class Seat:
     def __init__(self, row: int, number: int):
         self.row = row
         self.number = number
         self.is_available = True  # доступность
+
+    def to_json(self):
+        return {
+        'row' : self.row,
+        'number' : self.number,
+        'is_avaible' : self.is_available,
+    }
 
 # 4. Билет
 class Ticket:
