@@ -89,7 +89,7 @@ class Venue:
         place = elem.find("Place").text
         capacity = int(elem.find("Capacity").text)
         seats_elem = elem.find("Seats")
-        seats = [Seat.from_xml(seat_elem) for seat_elem in seats_elem] if seats_elem else []
+        seats = [Seat.from_xml(seat_elem) for seat_elem in seats_elem] if seats_elem is not None else []
         return Venue(name, place, capacity, seats)
 
 # 3. Место (на мероприятии)
@@ -231,11 +231,11 @@ class EventsManager:
         self.events_list = []
         self.current_id = 1  # Счетчик для уникальных идентификаторов
 
-    def create(self, name:str, datetime:datetime , venue: Venue ):
+    def create(self, name: str, datetime: datetime, venue: Venue):
         """Создает и добавляет новое мероприятие в список"""
-        event = Event(name = name, datetime = datetime, venue = Venue)
+        event = Event(name=name, date_time=datetime, venue=venue)
         event.id = self.current_id  # Добавляем уникальный идентификатор
-        self.events_list.append('Event')
+        self.events_list.append(event)  # Добавляем сам объект события
         self.current_id += 1
         return event
 
@@ -265,7 +265,7 @@ class EventsManager:
 
     def delete(self, event_id):
         """Удаляет мероприятие по его ID"""
-        event = self.event_by_id(event_id)
+        event = self.read_by_id(event_id)
         if event:
             self.events_list.remove(event)
             return f"Event with id {event_id} has been deleted."
