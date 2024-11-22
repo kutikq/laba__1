@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 import json
 
 # 1. Мероприятие
@@ -16,17 +16,28 @@ class Event:
             'date_time': self.date_time.isoformat() if self.date_time else None,
             #т.к. содержит Venue надо и для него написать функцию сериализации
             'venue': self.venue.to_json() if self.venue else None  # Сериализация venue
-        }     
+        }  
+       
+    @staticmethod
+    def from_json(js):
+        name = js['name']
+        #снова какие-то выкрутасы с date_time(сначала получаем строку, потом преобразуем в формат datetime)
+        date_time_str = js.get('date_time')  
+        date_time = datetime.fromisoformat(date_time_str) if date_time_str else None  # Преобразуем в datetime
+        venue = Venue.from_json(js.get('venue')) if js.get('venue') else None     #ну тут просто функция вызываем
+        return Event (name, date_time, venue)
+
+    
 
 # 2. Место проведения
 class Venue:
-    def __init__(self, name: str, place: str, capacity: int):
+    def __init__(self, name: str, place: str, capacity: int, seats: Optional[List['Seat']] = None):
         self.name = name
         self.place = place
         if capacity <= 0:
             raise ValueError("Capacity must be positive")
         self.capacity = capacity  # вместимость
-        self.seats: List['Seat'] = []  # список мест
+        self.seats: List['Seat'] = seats if seats else []# список мест
 
     def to_json(self):
         return {
@@ -36,12 +47,22 @@ class Venue:
             #аааааа, опять содежит список мест, снова писать def to_json
             'seats': [seat.to_json() for seat in self.seats]  # Список мест
         }
+    
+    @staticmethod
+    def from_json(js):
+        name = js['name']
+        place = js['place']
+        capacity = js['capacity']
+        #десериализация листа
+        seats = Seat.from_json_list(js['seats'])
+        return Venue(name, place, capacity, seats )
+    
 # 3. Место (на мероприятии)
 class Seat:
-    def __init__(self, row: int, number: int):
+    def __init__(self, row: int, number: int, is_avaible : bool = True):
         self.row = row
         self.number = number
-        self.is_available = True  # доступность
+        self.is_available = is_avaible 
 
     def to_json(self):
         return {
@@ -49,6 +70,20 @@ class Seat:
         'number' : self.number,
         'is_avaible' : self.is_available,
     }
+    
+    @staticmethod
+    def from_json(js):
+        row = js['row']
+        number = js['number']
+        is_avaible = js['is_avaible']
+
+        return Seat(row, number, is_avaible )
+    
+    #для листа отдельную функцию
+    @staticmethod
+    def from_json_list(json_list):
+        #Десериализация списка объектов
+        return [Seat.from_json(item) for item in json_list]
 
 # 4. Билет
 class Ticket:
