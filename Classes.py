@@ -36,6 +36,14 @@ class Event:
             event_elem.append(self.venue.to_xml())
         return event_elem
     
+    @staticmethod
+    def from_xml(elem: ET.Element) -> 'Event':
+        name = elem.find("Name").text
+        date_time_str = elem.find("DateTime").text
+        date_time = datetime.fromisoformat(date_time_str) if date_time_str else None
+        venue_elem = elem.find("Venue")
+        venue = Venue.from_xml(venue_elem) if venue_elem is not None else None
+        return Event(name, date_time, venue)
 
 # 2. Место проведения
 class Venue:
@@ -75,6 +83,15 @@ class Venue:
             seats_elem.append(seat.to_xml())
         return venue_elem
     
+    @staticmethod
+    def from_xml(elem: ET.Element) -> 'Venue':
+        name = elem.find("Name").text
+        place = elem.find("Place").text
+        capacity = int(elem.find("Capacity").text)
+        seats_elem = elem.find("Seats")
+        seats = [Seat.from_xml(seat_elem) for seat_elem in seats_elem] if seats_elem else []
+        return Venue(name, place, capacity, seats)
+
 # 3. Место (на мероприятии)
 class Seat:
     def __init__(self, row: int, number: int, is_avaible : bool = True):
@@ -109,6 +126,13 @@ class Seat:
         ET.SubElement(seat_elem, "Number").text = str(self.number)
         ET.SubElement(seat_elem, "IsAvailable").text = str(self.is_available)
         return seat_elem
+    
+    @staticmethod
+    def from_xml(elem: ET.Element) -> 'Seat':
+        row = int(elem.find("Row").text)
+        number = int(elem.find("Number").text)
+        is_available = elem.find("IsAvailable").text.lower() == "true"
+        return Seat(row, number, is_available)
 
 # 4. Билет
 class Ticket:
