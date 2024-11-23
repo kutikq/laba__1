@@ -175,9 +175,13 @@ class Order:
         return sum(ticket.category.price_multiplier for ticket in self.tickets)
     
     def pay(self):
-        if self.is_paid:
-            raise OrderAlreadyPaidError("This order has already been paid.")
-        self.is_paid = True
+        try:
+            if self.is_paid:
+                raise OrderAlreadyPaidError("This order has already been paid.")
+            self.is_paid = True
+            print("Order has been successfully paid.")
+        except OrderAlreadyPaidError as e:
+            print(f"Error: {e}")
 
 # 8. Оплата
 class Payment:
@@ -323,13 +327,13 @@ save_to_json(event.to_json(), "event.json")
 
 # Загружаем из JSON
 loaded_event = load_from_json("event.json")
-print(loaded_event.name)  # Проверяем
+print(loaded_event)  # Проверяем
 
 # Сохраняем в XML
 save_to_xml(event.to_xml(), "event.xml")
 
 # Загружаем из XML
 loaded_event = load_from_xml("event.xml")
-print(loaded_event.name)  # Проверяем
+print(loaded_event)  # Проверяем
 
 
