@@ -273,3 +273,31 @@ class EventsManager:
 
 
 manager = EventsManager()
+
+# Считывание и запись данных в формате JSON
+def save_to_json(obj, filename: str):
+    """Сохраняет объект в файл в формате JSON"""
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(obj, f, ensure_ascii=False, indent=4)
+
+
+def load_from_json(filename: str):
+    """Загружает данные из файла JSON и возвращает объект"""
+    with open(filename, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        # Пытаемся восстановить объект из JSON
+        return Event.from_json(data)
+
+
+# Считывание и запись данных в формате XML
+def save_to_xml(obj, filename: str):
+    """Сохраняет объект в файл в формате XML"""
+    tree = ET.ElementTree(obj.to_xml())
+    tree.write(filename, encoding='utf-8', xml_declaration=True)
+
+
+def load_from_xml(filename: str):
+    """Загружает данные из файла XML и возвращает объект"""
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    return Event.from_xml(root)
