@@ -301,3 +301,35 @@ def load_from_xml(filename: str):
     tree = ET.parse(filename)
     root = tree.getroot()
     return Event.from_xml(root)
+
+#создаем спписок мест
+seats: List['Seat'] = [
+    Seat(row=1, number=1),
+    Seat(row=1, number=2),
+    Seat(row=1, number=3),
+    Seat(row=2, number=1),
+    Seat(row=2, number=2),
+    Seat(row=2, number=3),
+]
+
+# Создаем объект Venue с этим списком мест
+venue = Venue("Частилище", "Ад", 666, seats)
+
+#теперь создадим сероприятие
+event = Event("BB Streamers Battle" , datetime.now(), venue)
+
+# Сохраняем в JSON
+save_to_json(event, "event.json")
+
+# Загружаем из JSON
+loaded_event = load_from_json("event.json")
+print(loaded_event.name)  # Проверяем
+
+# Сохраняем в XML
+save_to_xml(event, "event.xml")
+
+# Загружаем из XML
+loaded_event = load_from_xml("event.xml")
+print(loaded_event.name)  # Проверяем
+
+
