@@ -292,7 +292,7 @@ def load_from_json(filename: str):
 # Считывание и запись данных в формате XML
 def save_to_xml(obj, filename: str):
     """Сохраняет объект в файл в формате XML"""
-    tree = ET.ElementTree(obj.to_xml())
+    tree = ET.ElementTree(obj)  # Убираем вызов .to_xml(), т.к. obj уже элемент XML
     tree.write(filename, encoding='utf-8', xml_declaration=True)
 
 
@@ -319,14 +319,14 @@ venue = Venue("Частилище", "Ад", 666, seats)
 event = Event("BB Streamers Battle" , datetime.now(), venue)
 
 # Сохраняем в JSON
-save_to_json(event, "event.json")
+save_to_json(event.to_json(), "event.json")
 
 # Загружаем из JSON
 loaded_event = load_from_json("event.json")
 print(loaded_event.name)  # Проверяем
 
 # Сохраняем в XML
-save_to_xml(event, "event.xml")
+save_to_xml(event.to_xml(), "event.xml")
 
 # Загружаем из XML
 loaded_event = load_from_xml("event.xml")
