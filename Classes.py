@@ -69,7 +69,7 @@ class Venue:
         name = js['name']
         place = js['place']
         capacity = js['capacity']
-        #десериализация листа
+        #десериализация листа мест
         seats = Seat.from_json_list(js['seats'])
         return Venue(name, place, capacity, seats )
     
@@ -160,19 +160,22 @@ class User:
         self.name = user_name
         self.email = email
 
+class OrderAlreadyPaidError(Exception):
+    """ Исключение, если заказ уже оплачен. """
+    pass
+
 # 7. Заказ
 class Order:
-    def __init__(self, user: 'User', tickets: List['Ticket'] = []):
+    def __init__(self, user: 'User', tickets: List['Ticket'] = [], is_paid : bool = False):
         self.user = user
         self.tickets = tickets
-        self.is_paid = False
 
     def calculate_total_price(self) -> float:
         return sum(ticket.category.price_multiplier for ticket in self.tickets)
-
+    
     def pay(self):
         if self.is_paid:
-            raise ValueError("Order is already paid")
+            raise OrderAlreadyPaidError("This order has already been paid.")
         self.is_paid = True
 
 # 8. Оплата
